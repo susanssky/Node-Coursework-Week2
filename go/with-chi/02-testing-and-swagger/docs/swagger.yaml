@@ -1,0 +1,228 @@
+basePath: /api/v1
+definitions:
+  store.CreateMessageRequest:
+    properties:
+      from:
+        example: Alice
+        type: string
+      text:
+        example: Hello World
+        type: string
+    type: object
+  store.Message:
+    properties:
+      from:
+        type: string
+      id:
+        type: string
+      text:
+        type: string
+      time_sent:
+        type: string
+    type: object
+  utils.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  utils.Response-array_store_Message:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/store.Message'
+        type: array
+    type: object
+  utils.Response-store_Message:
+    properties:
+      data:
+        $ref: '#/definitions/store.Message'
+    type: object
+host: localhost:4001
+info:
+  contact: {}
+  description: This is a RESTful API for the CYF chat application, providing message
+    management capabilities.
+  title: CYF Chat Application API
+  version: "1.0"
+paths:
+  /messages:
+    get:
+      description: Return a list of all messages in the app
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message list
+          schema:
+            $ref: '#/definitions/utils.Response-array_store_Message'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Get all messages
+      tags:
+      - messages
+    post:
+      consumes:
+      - application/json
+      description: Create a new message and add it to the system
+      parameters:
+      - description: Message content
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/store.CreateMessageRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successful creation of message
+          schema:
+            $ref: '#/definitions/utils.Response-store_Message'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Create a message
+      tags:
+      - messages
+  /messages/{messageId}:
+    delete:
+      description: Deletes a message with the specified ID and returns no content
+        on success
+      parameters:
+      - description: Message ID
+        in: path
+        name: messageId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content - Message successfully deleted
+        "404":
+          description: No matching message found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Delete a message by ID
+      tags:
+      - messages
+    get:
+      description: Return a message by ID
+      parameters:
+      - description: Message ID
+        in: path
+        name: messageId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: the message if matched
+          schema:
+            $ref: '#/definitions/utils.Response-store_Message'
+        "404":
+          description: No matching messages found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Get a message by ID
+      tags:
+      - messages
+    put:
+      consumes:
+      - application/json
+      description: Return an updated message by ID
+      parameters:
+      - description: Message ID
+        in: path
+        name: messageId
+        required: true
+        type: string
+      - description: Updated message content
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/store.CreateMessageRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: the updated message
+          schema:
+            $ref: '#/definitions/utils.Response-store_Message'
+        "404":
+          description: No matching messages found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Update a message by ID
+      tags:
+      - messages
+  /messages/latest:
+    get:
+      description: Return the latest 10 messages
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: the latest 10 messages list
+          schema:
+            $ref: '#/definitions/utils.Response-array_store_Message'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Get the latest 10 messages
+      tags:
+      - messages
+  /messages/search:
+    get:
+      description: Return the messages that has searched if matched
+      parameters:
+      - description: Text to search for in messages
+        in: query
+        name: text
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: the messages list if matched
+          schema:
+            $ref: '#/definitions/utils.Response-array_store_Message'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: No matching messages found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Get the messages that has searched if matched
+      tags:
+      - messages
+swagger: "2.0"

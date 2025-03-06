@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-stack-srv
+spec:
+  selector:
+    app: redis-stack-depl
+  ports:
+    - port: 6379
+      targetPort: 6379
+      name: redis
+      protocol: TCP
+    - port: 8001
+      targetPort: 8001
+      name: redisinsight
+      protocol: TCP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-stack-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis-stack-depl
+  template:
+    metadata:
+      labels:
+        app: redis-stack-depl
+    spec:
+      containers:
+        - name: redis
+          image: redis/redis-stack:latest
+          resources:
+            limits:
+              cpu: "1000m"
+              memory: "1024Mi"
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
